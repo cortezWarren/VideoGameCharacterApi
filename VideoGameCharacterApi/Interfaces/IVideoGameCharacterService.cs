@@ -6,8 +6,8 @@ namespace VideoGameCharacterApi.Interfaces
     {
         Task<List<CharacterResponse>> GetAllCharactersAsync();
         Task<CharacterResponse?> GetCharacterByIdAsync(int id);
-        //Task<Character> AddCharacterAsync(Character character);
-        //Task<bool> UpdateCharacterAsync(int id, Character character);
+        Task<CharacterResponse> AddCharacterAsync(CreateCharacterRequest character);
+        Task<bool> UpdateCharacterAsync(int id, UpdateCharacterRequest character);
         //Task<bool> DeleteCharacterAsync(int id);
     }
 }

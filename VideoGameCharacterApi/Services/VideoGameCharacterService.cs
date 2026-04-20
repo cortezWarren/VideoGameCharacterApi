@@ -2,6 +2,7 @@
 using VideoGameCharacterApi.DTOs;
 using VideoGameCharacterApi.Data;
 using Microsoft.EntityFrameworkCore;
+using VideoGameCharacterApi.Models;
 
 namespace VideoGameCharacterApi.Services
 {
@@ -10,6 +11,7 @@ namespace VideoGameCharacterApi.Services
         public async Task<List<CharacterResponse>> GetAllCharactersAsync()
             => await context.Characters.Select(c => new CharacterResponse
             {
+                Id = c.Id,
                 Name = c.Name,
                 Game = c.Game,
                 Role = c.Role
@@ -20,6 +22,7 @@ namespace VideoGameCharacterApi.Services
             var result = await context.Characters.Where(c => c.Id == id)
                 .Select(c => new CharacterResponse
                 {
+                    Id = c.Id,
                     Name = c.Name,
                     Game = c.Game,
                     Role = c.Role
@@ -29,18 +32,38 @@ namespace VideoGameCharacterApi.Services
             return result;
         }
 
-        //public async Task<Character> AddCharacterAsync(Character character)
-        //{
-        //    Character newCharacter = new Character
-        //    {
-        //        Id = characters.Count + 1,
-        //        Name = character.Name,
-        //        Game = character.Game,
-        //        Role = character.Role
-        //    };
-        //    characters.Add(newCharacter);
+        public async Task<CharacterResponse> AddCharacterAsync(CreateCharacterRequest character)
+        {
+            var newCharacter = new Character
+            {
+                Name = character.Name,
+                Game = character.Game,
+                Role = character.Role
+            };
+            context.Characters.Add(newCharacter);
+            await context.SaveChangesAsync();
 
-        //    return await Task.FromResult(newCharacter);
-        //}
+            return new CharacterResponse
+            {
+                Id = newCharacter.Id,
+                Name = newCharacter.Name,
+                Game = newCharacter.Game,
+                Role = newCharacter.Role
+            };
+        }
+
+        public async Task<bool> UpdateCharacterAsync(int id, UpdateCharacterRequest character)
+        {
+            var existingCharacter = await context.Characters.FindAsync(id);
+            if (existingCharacter is null) return false;
+
+            existingCharacter.Name = character.Name;
+            existingCharacter.Game = character.Game;
+            existingCharacter.Role = character.Role;
+
+            await context.SaveChangesAsync();
+            return true;
+        }
+
     }
 }

@@ -13,16 +13,25 @@ namespace VideoGameCharacterApi.Controllers
             => Ok(await videoGameCharacterService.GetAllCharactersAsync());
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<CharacterResponse>> GetCharacterByIdAsync(int id)
+        public async Task<ActionResult<CharacterResponse>> GetCharacter(int id)
         {
             var character = await videoGameCharacterService.GetCharacterByIdAsync(id);
 
             return character is null ? NotFound("Character is not found") : Ok(character);
         }
 
-        //[HttpPost]
-        //public async Task<ActionResult<Character>> AddCharacterAsync(Character character)
-        //    => Ok(await videoGameCharacterService.AddCharacterAsync(character));
-        
+        [HttpPost]
+        public async Task<ActionResult<CharacterResponse>> AddCharacterAsync(CreateCharacterRequest character)
+        {
+            var newCharacter = await videoGameCharacterService.AddCharacterAsync(character);
+            return CreatedAtAction(nameof(GetCharacter), new {id = newCharacter.Id}, newCharacter);
+        }
+
+        [HttpPut("{id}")]
+        public async Task<ActionResult> UpdateCharacter(int id, UpdateCharacterRequest character) 
+        {
+            var updated = await videoGameCharacterService.UpdateCharacterAsync(id, character);
+            return updated ? NoContent() : NotFound("Character with given Id not found");
+        }
     }
 }
